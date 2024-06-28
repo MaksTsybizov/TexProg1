@@ -1,0 +1,66 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+package basic.atm;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class Operation {
+    private String cardNumber;
+    private String pincode;
+    private Integer balance;
+
+    Operation(String cardNumber, String pincode) {
+        this.cardNumber = cardNumber;
+        this.pincode = pincode;
+    }
+
+    public Integer showBalance(String cardNumber) {
+        try {
+            Connection c = Database.connection();
+            Statement stmt5 = c.createStatement();
+            String sql5 = "SELECT * FROM balance WHERE card_number = " + cardNumber;
+
+            for(ResultSet rs5 = stmt5.executeQuery(sql5); rs5.next(); this.balance = rs5.getInt(2)) {
+            }
+        } catch (Exception var6) {
+            Exception e = var6;
+            System.out.println(e);
+        }
+
+        return this.balance;
+    }
+
+    public void deposit(Integer amount, String cardNumber) {
+        try {
+            Connection c = Database.connection();
+            Statement stmt6 = c.createStatement();
+            String sql6 = "UPDATE balance SET balance = balance + '" + amount + "' WHERE card_number = " + cardNumber;
+            stmt6.executeUpdate(sql6);
+        } catch (Exception var6) {
+            Exception e = var6;
+            System.out.println(e);
+        }
+
+    }
+
+    public void sendMoneyToOther(Integer amountOther, String numberOther, String cardNumber) {
+        try {
+            Connection c = Database.connection();
+            Statement stmt8 = c.createStatement();
+            String sql8 = "UPDATE balance SET balance = balance + " + amountOther + " WHERE card_number = '" + numberOther + "'";
+            stmt8.executeUpdate(sql8);
+            Statement stmt9 = c.createStatement();
+            String sql9 = "UPDATE balance SET balance = balance - " + amountOther + " WHERE card_number = '" + cardNumber + "'";
+            stmt9.executeUpdate(sql9);
+        } catch (Exception var9) {
+            Exception e = var9;
+            System.out.println(e);
+        }
+
+    }
+}
