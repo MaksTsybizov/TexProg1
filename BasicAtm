@@ -1,0 +1,105 @@
+package basic.atm;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class BasicAtm {
+    public static boolean isLogin = false;
+
+    public BasicAtm() {
+    }
+
+    public static void main(String[] args) {
+        Integer option = 0;
+        Scanner scanner = new Scanner(System.in);
+
+        while(option == 0) {
+            System.out.println("==== Добро пожаловать! Рады приветствовать в нашем банке! ====");
+            System.out.println("1. Создать личный кабинет");
+            System.out.println("2. Войти в систему\n");
+
+            while(option < 1 || option > 2) {
+                System.out.println("Выберите необходимый вариант: ");
+                option = scanner.nextInt();
+            }
+        }
+
+        switch (option) {
+            case 1:
+                System.out.println("\n\n=== Создание личного кабинета ===\n");
+                System.out.println("Введите ваше Имя:");
+                String firstName = scanner.next().trim();
+                System.out.println("Введите вашу Фамилию:");
+                String lastName = scanner.next().trim();
+                Account account = new Account(firstName, lastName);
+                account.register();
+                break;
+            case 2:
+                System.out.println("\n\n==== Введите данные личного кабинета ====\n");
+                System.out.println("Введите номер ваше карты: ");
+                String cardNumber = scanner.next();
+                System.out.println("Введите пин-код карты: ");
+                String pincode = scanner.next();
+                Operation operation = new Operation(cardNumber, pincode);
+
+                try {
+                    Connection c = Database.connection();
+                    Statement stmt4 = c.createStatement();
+                    String sql4 = "SELECT * FROM card WHERE card_number = '" + cardNumber + "' AND pincode = '" + pincode + "'";
+                    ResultSet rs4 = stmt4.executeQuery(sql4);
+                    if (rs4.next()) {
+                        isLogin = true;
+                        System.out.println("\n\n==== Вход был выполнен успешно! ====\n");
+                        System.out.println("--- Введите необходимый вариант ---");
+                        System.out.println("1. Баланс");
+                        System.out.println("2. Депозит");
+                        System.out.println("3. Перевод");
+
+                        Integer option_user;
+                        for(option_user = 0; option_user < 1 || option_user > 3; option_user = scanner.nextInt()) {
+                            System.out.println("\nВыберите необходимый вариант: ");
+                        }
+
+                        Integer balance = 0;
+                        switch (option_user) {
+                            case 1:
+                                System.out.println("\n\n==== Показать баланс ====\n");
+                                balance = operation.showBalance(cardNumber);
+                                System.out.println(balance);
+                                break;
+                            case 2:
+                                System.out.println("\n\n==== Внести депозит ====\n");
+
+                                Integer amount;
+                                for(amount = 0; amount <= 0; amount = scanner.nextInt()) {
+                                    System.out.println("Сумма: ");
+                                }
+
+                                operation.deposit(amount, cardNumber);
+                                balance = operation.showBalance(cardNumber);
+                                System.out.println("\nТекущий баланс составляет " + balance);
+                                break;
+                            case 3:
+                                System.out.println("\n\n==== Выполнить перевод на другую карту ====\n");
+                                System.out.println("Введите номер карты получателя: ");
+                                String number_other = scanner.next();
+
+                                Integer amountOther;
+                                for(amountOther = 0; amountOther <= 0; amountOther = scanner.nextInt()) {
+                                    System.out.println("Введите сумму перевода: ");
+                                }
+
+                                operation.sendMoneyToOther(amountOther, number_other, cardNumber);
+                                System.out.println("\nВы отправили " + amountOther + " к " + number_other);
+                        }
+                    } else {
+                        System.out.println("\nОшибка входа в систему");
+                    }
+                } catch (Exception var18) {
+                }
+        }
+
+    }
+}
